@@ -1,0 +1,67 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}">
+<!DOCTYPE html>
+
+<head>
+<title>My Smart Home</title>
+
+<!-- Tell the browser to be responsive to screen width -->
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+<!-- Bootstrap 3.3.7 -->
+<link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+<!-- Theme style -->
+<link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+
+<!-- AdminLTE Skins. Choose a skin from the css/skins folder instead of downloading all of them to reduce the load. -->
+<link rel="stylesheet" href="/static/dist/css/skins/_all-skins.min.css">
+
+<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+<!-- Google Font -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+<link type="text/css" rel="stylesheet" href="css/main.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery‐3.2.1.js"></script>
+
+</head>
+
+<body class="hold-transition skin-blue layout-top-nav">
+	<div class="wrapper">
+		<header class="main-header">
+			<nav class="navbar navbar-static-top">
+				<a href="/">
+					<img src="/static/home.jpg" alt="Home" id="home" width="50px" height="50px">
+					<h1 id="smarthome">SMART HOME</h1>
+				</a>
+			</nav>
+  		</header>
+  		<!-- Full Width Column -->
+  		<div class="content-wrapper">
+    			<div class="container">
+      				<!-- Main content -->
+				<section class="content">
+        					<div class="col-lg-12">
+          						<div class="box box-primary">
+            							<div class="box-header with-border" id="imageTitle">
+              								<h3 class="box-title">User: <strong>{{name}}</strong></h3>
+									<br />
+									<h3 class="box-title">Photo Taken on <strong>{{datetime}}</strong></h3>
+            							</div>
+								<br />
+									<img src="https://s3-us-west-2.amazonaws.com/accesssmarthome/{{datetime}}.jpg" alt="image" id="image" width="720px" height="405px">
+            							<br />
+									<a href="/"><h4 id="backHome">[ Back to Home Page ]</h4></a>
+								<br />
+          						</div>
+						</div>
+				</section>
+			</div>
+		</div>
+</body>
+</html>

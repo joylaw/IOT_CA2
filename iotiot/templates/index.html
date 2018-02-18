@@ -1,0 +1,378 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}">
+<!DOCTYPE html>
+
+<head>
+  <title>My Smart Home</title>
+
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+
+  <!-- AdminLTE Skins. Choose a skin from the css/skins folder instead of downloading all of them to reduce the load. -->
+  <link rel="stylesheet" href="/static/dist/css/skins/_all-skins.min.css">
+
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+  <!-- Google Font -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+  <link type="text/css" rel="stylesheet" href="css/main.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
+  <script type="text/javascript" src="/static/dist/js/Chart.bundle.min.js"></script>
+
+  <script type="text/javascript" src="/static/dist/js/moment.js"></script>
+
+  <script>
+
+    function turn_on_led(led, state){
+      $.ajax({
+        url: "/writeLED/"+led+"/"+state
+      })
+    }
+
+    function rfid() {
+      $.ajax({
+        url: "writeRFID"
+      })
+    }
+
+    function ledupdate(){
+     $.ajax({
+        url: "/readLED/0",
+        success: function(result) {
+          if (result.response) {
+            $('input[id="red"]').prop('checked', true);
+          }
+        }
+      })
+
+      $.ajax({
+        url: "/readLED/1",
+        success: function(result) {
+          if (result.response) {
+            $('input[id="green"]').prop('checked', true);
+          }
+        }
+      })
+
+      $.ajax({
+        url: "/readLED/2",
+        success: function(result) {
+          if (result.response) {
+            $('input[id="yellow"]').prop('checked', true);
+          }
+        }
+      })
+
+      $.ajax({
+        url: "/readLED/3",
+        success: function(result) {
+          if (result.response) {
+            $('input[id="redtwo"]').prop('checked', true);
+          }
+        }
+      })
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var checkbox = document.querySelector('input[id="red"]');
+
+      checkbox.addEventListener('change', function() {
+        if (checkbox.checked) {
+          turn_on_led(0, "ON")
+        } else {
+          turn_on_led(0, "OFF")
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var checkbox = document.querySelector('input[id="green"]');
+
+      checkbox.addEventListener('change', function() {
+        if (checkbox.checked) {
+          turn_on_led(1, "ON")
+        } else {
+          turn_on_led(1, "OFF")
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var checkbox = document.querySelector('input[id="yellow"]');
+
+      checkbox.addEventListener('change', function() {
+        if (checkbox.checked) {
+          turn_on_led(2, "ON")
+        } else {
+          turn_on_led(2, "OFF")
+        }
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      var checkbox = document.querySelector('input[id="redtwo"]');
+
+      checkbox.addEventListener('change', function() {
+        if (checkbox.checked) {
+          turn_on_led(3, "ON")
+        } else {
+          turn_on_led(3, "OFF")
+        }
+      });
+    });
+
+    $(document).ready(function() {
+      var tempchart = document.getElementById('temp-chart').getContext('2d');
+      var humiditychart = document.getElementById('humidity-chart').getContext('2d');
+
+      var config = {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Temperature',
+            data: [],
+            backgroundColor: "rgba(255,0,0,0.4)",
+            borderColor: "rgba(255,0,0,0.4)",
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          title: {
+            display: true,
+            text: 'Temperature graph'
+          },
+	  scales: {
+	    yAxes : [{
+                    ticks : {
+                        max : 35.0,    
+                        min : 15.0
+                    }
+                }]
+	  }
+        }
+      }
+
+      var config2 = {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Humidity',
+            data: [],
+            backgroundColor: "rgba(0,255,0,0.4)",
+            borderColor: "rgba(0,255,0,0.4)",
+            fill: false
+          }]
+        },
+        options: {
+          responsive: true,
+          title: {
+            display: true,
+            text: 'Humidity Graph'
+          },
+	  scales: {
+	    yAxes : [{
+                    ticks : {
+                        max : 80.0,    
+                        min : 20.0
+                    }
+                }]
+	  }
+        }
+      }
+
+      var tempG = new Chart(tempchart, config);
+      var humidityG = new Chart(humiditychart, config2);
+
+
+      function dataupdate() {
+
+        var axisLabel = [];
+
+        $.ajax({
+          url: "MQTTGraphValues",
+          success: function(result) {
+            var datalist = result.graphdata;
+
+            for (var i = 0; i < datalist[0].length; i++) {
+              axisLabel.push(moment(datalist[0][i]).format('h:mm:ss a'));
+            }
+
+            tempG.data.datasets.forEach((dataset) => {
+              dataset.data = datalist[1];
+            });
+
+            humidityG.data.datasets.forEach((dataset) => {
+              dataset.data = datalist[2];
+            });
+
+            tempG.data.labels = axisLabel;
+            humidityG.data.labels = axisLabel;
+
+            $("#temp").text(datalist[1][datalist[1].length - 1]);
+            $("#hum").text(datalist[2][datalist[2].length - 1]);
+          }
+        })
+
+        tempG.update()
+        humidityG.update()
+      }
+
+      // Reduce the values to increase update speed
+      setInterval(dataupdate, 5000);
+      //setInterval(ledupdate, 2500);
+      ledupdate()
+    });
+  </script>
+</head>
+
+<body class="hold-transition skin-blue layout-top-nav">
+  <div class="wrapper">
+    <header class="main-header">
+      <nav class="navbar navbar-static-top">
+        <a href="/" style="float: left;">
+		<img src="/static/home.jpg" alt="Home" id="home" width="50px" height="50px">
+		<h1 id="smarthome">SMART HOME</h1>
+	</a>
+	<a href="newUser"><button style="float:right; color: black; margin-right: 9%; margin-top: 2%; border: none; border-radius: 2px; padding: 3px; padding-left: 8px; padding-right: 8px; background-color: #E8E8E8;">Add New User</button></a>
+      </nav>
+    </header>
+    <!-- Full Width Column -->
+    <div class="content-wrapper">
+      <div class="container">
+        <!-- Main content -->
+        <section class="content">
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="box box-primary">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Home Access History</h3>
+                </div>
+
+                <div class="box-body">
+                  <table class="table table-bordered">
+                    <tr>
+                      <th style="width:40%">Date (YYYY:MM:DD)</th>
+		      <th style="width:40%">Time (HH:mm:SS)</th>
+                      <th style="width:20%">User</th>
+                    </tr>
+                    {% for row in results %}
+                    <tr>
+                      <td>{{ row[1][0:10] }}</td>
+                      <td>{{ row[1][11:13] }}:{{ row[1][14:16] }}:{{ row[1][17:19] }}</td>
+                      <td><a href="showImage/{{row[0]}}">{{ row[2] }}</a></td>
+                    </tr>
+                    {% endfor %}
+                  </table>
+                </div>
+              </div>
+
+            </div>
+            <div class="col-lg-2">
+              <div class="box" id="control">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Bed Room</h3>
+                </div>
+                <br />
+                <img src="/static/redled.jpg" alt="Red LED" id="LED" width="80px" height="80px">
+                <label class="switch">
+						  			<input type="checkbox" id="red">
+						  			<span class="slider round"></span>
+								</label>
+
+              </div>
+              <div class="box" id="control">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Living Room</h3>
+                </div>
+                <br />
+                <img src="/static/greenled.jpg" alt="Green LED" id="LED" width="80px" height="80px">
+                <label class="switch">
+						  			<input type="checkbox" id="green">
+						  			<span class="slider round"></span>
+								</label>
+
+              </div>
+            </div>
+            <div class="col-lg-2">
+              <div class="box" id="control">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Toilet</h3>
+                </div>
+                <br />
+                <img src="/static/yellowled.jpg" alt="Yellow LED" id="LED" width="80px" height="80px">
+                <label class="switch">
+						  			<input type="checkbox" id="yellow">
+						  			<span class="slider round"></span>
+								</label>
+
+              </div>
+              <div class="box" id="control">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Kitchen</h3>
+                </div>
+                <br />
+                <img src="/static/redled.jpg" alt="Red LED" id="LED" width="80px" height="80px">
+                <label class="switch">
+						  			<input type="checkbox" id="redtwo">
+						  			<span class="slider round"></span>
+								</label>
+
+              </div>
+            </div>
+            <div class="col-lg-2">
+              <div class="box" id="control">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Temperature (°C)</h3>
+                </div>
+                <br />
+                <h1 id="temp"></h1>
+              </div>
+              <div class="box" id="control">
+                <div class="box-header with-border">
+                  <h3 class="box-title">Humidity (%)</h3>
+                </div>
+                <br />
+                <h1 id="hum"></h1>
+              </div>
+            </div>
+          </div>
+          <!-- Graphs -->
+          <div class="row">
+            <div class="col-lg-6">
+              <div class="box">
+                <canvas id="temp-chart"></canvas>
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <div class="box">
+                <canvas id="humidity-chart"></canvas>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- jQuery 3 -->
+        <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
+        <!-- Bootstrap 3.3.7 -->
+        <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+        <!-- SlimScroll -->
+        <script src="/static/bower_components/jquery-slimscroll/jquery.slimscroll.min.js"></script>
+        <!-- FastClick -->
+        <script src="/static/bower_components/fastclick/lib/fastclick.js"></script>
+        <!-- AdminLTE App -->
+        <script src="/static/dist/js/adminlte.min.js"></script>
+</body>
+
+</html>

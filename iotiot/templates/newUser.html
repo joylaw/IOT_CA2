@@ -1,0 +1,116 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='stylesheet.css') }}">
+<!DOCTYPE html>
+
+<head>
+<title>My Smart Home</title>
+
+<!-- Tell the browser to be responsive to screen width -->
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+<!-- Bootstrap 3.3.7 -->
+<link rel="stylesheet" href="/static/bower_components/bootstrap/dist/css/bootstrap.min.css">
+
+<!-- Theme style -->
+<link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+
+<!-- AdminLTE Skins. Choose a skin from the css/skins folder instead of downloading all of them to reduce the load. -->
+<link rel="stylesheet" href="/static/dist/css/skins/_all-skins.min.css">
+
+<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+<!-- Google Font -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+
+<link type="text/css" rel="stylesheet" href="css/main.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<style>
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto; /* 15% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 20%; /* Could be more or less, depending on screen size */
+    height: 30%;
+    text-align: center;
+}
+</style>
+<script>
+$(document).ready(function() {
+	$.get( "readRFID", function( data ) {
+	  $('#myModal').modal('show');
+	 alert( "Data Loaded: " + data.uid );
+	  document.getElementById("uid").value = data.uid;
+	});
+})
+</script>
+</head>
+
+<body class="hold-transition skin-blue layout-top-nav">
+<div class="wrapper">
+		<header class="main-header">
+			<nav class="navbar navbar-static-top">
+				<a href="/">
+					<img src="/static/home.jpg" alt="Home" id="home" width="50px" height="50px">
+					<h1 id="smarthome">SMART HOME</h1>
+				</a>
+			</nav>
+  		</header>
+  		<!-- Full Width Column -->
+  		<div class="content-wrapper">
+    			<div class="container">
+      				<!-- Main content -->
+				<section class="content">
+        					<div class="col-lg-12">
+          						<div class="box box-primary">
+            							<div class="box-header with-border" id="imageTitle">
+              								<h3 class="box-title">Scan your Card</strong></h3>
+            							</div>
+								<br />
+								<img src="/static/card.jpg" style="width: 40%; height: auto;" class="center">
+            							<br />
+									<a href="/"><h4 id="backHome">[ Back to Home Page ]</h4></a>
+								<br />
+          						</div>
+						</div>
+				</section>
+			</div>
+		</div>
+
+<div id="myModal" class="modal">
+	<div class="modal-content">
+		<span class="close">&times;</span>
+		<form method="POST" action="addUser">
+			<br />
+			Username:<br><br>
+			<input type="text" name="name">
+			<br /> <br />
+			<input type="hidden" id="uid" name="uid" value="">
+			<input type="submit" value="Submit">
+		</form> 
+  	</div>
+</div>
+</body>
+</html>
