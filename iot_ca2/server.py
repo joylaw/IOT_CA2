@@ -18,7 +18,7 @@ from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
 from flask import Flask, request, Response, render_template
 import RPi.GPIO as GPIO
 import MFRC522
-from flask import Flask,redirect
+from flask import Flask,redirect, url_for
 import picamera
 import os
 
@@ -36,7 +36,7 @@ def light_status(client, userdata, message):
 def mqtt_connect():
 	my_rpi = AWSIoTMQTTClient("subscriber_led")
 
-	host = "a2jaqhb8rc300f.iot.us-west-2.amazonaws.com"
+	host = "a7gx67jy14o4h.iot.us-west-2.amazonaws.com"
 	rootCAPath = "rootca.pem"
 	certificatePath = "certificate.pem.crt"
 	privateKeyPath = "private.pem.key"
@@ -56,7 +56,7 @@ def mqtt_connect():
 
 def dbconnect():
 	try:
-		db = pymysql.connect(host = "iot.cyygylyw5wux.us-west-2.rds.amazonaws.com", user="admin",passwd="!QWER4321", port=3306, db="iot")
+		db = pymysql.connect(host = "iotca2.cmwnxcwvcz4v.us-west-2.rds.amazonaws.com", user="admin",passwd="!QWER4321", port=3306, db="iotca2")
 		print("Successfully connected to database")
 		return db
 	except:
@@ -92,7 +92,7 @@ def showRFID():
 
 	try:
 		results = []
-		curs.execute("SELECT id, date_time, name from rfid_accesslog L, rfid_access A WHERE L.rfid_uid=A.rfid_uid order by L.id desc limit 8")
+		curs.execute("SELECT id, date_time, name from rfid_accesslog L, rfid_access A WHERE L.rfid_uid=A.rfid_uid order by L.id desc")
 		data = curs.fetchall() #get all the results in database
 		for row in data:
 			results.append(row)
@@ -111,8 +111,15 @@ app = Flask(__name__)
 @app.route("/")
 def index():
 	results = showRFID()
+	msg = ""
+	try:
+		msg = json.loads(request.args['msg'])
+		msg = msg[msg]
+	except:
+		pass
 	templateData = {
-		'results' : results
+		'results' : results,
+		'msg' : msg
 	}
 	return render_template('index.html', **templateData)
 
@@ -128,21 +135,19 @@ def addUser():
                 name = request.form['name']
 		uid = uid.replace(',', ', ')
 		uid = '['+uid+']'
-
-		print uid
-		print name
-
-		db = dbconnect()
-		curs = db.cursor()
-
-		sql = "INSERT INTO rfid_access (rfid_uid, name) VALUES (\'{0}\', \'{1}\')".format(uid, name)
-
-		curs.execute(sql)
-		db.commit()
+		try:
+			db = dbconnect()
+			curs = db.cursor()
+			sql = "INSERT INTO rfid_access (rfid_uid, name) VALUES (\'{0}\', \'{1}\')".format(uid, name)
+			curs.execute(sql)
+			msg = json.dumps({"msg":"User has been added."})
+			db.commit()
+		except pymysql.IntegrityError:
+			msg = json.dumps({"msg":"Failed to add user. Please try again."})
 		curs.close()
 		db.close()
 
-	return redirect('/')
+	return redirect(url_for('.index', msg=msg))
 
 @app.route("/newUser")
 def newUser():
@@ -159,7 +164,7 @@ def writeLED(LED, status):
 
 	my_rpi = AWSIoTMQTTClient("publisher_led")
 
-	host = "a2jaqhb8rc300f.iot.us-west-2.amazonaws.com"
+	host = "a7gx67jy14o4h.iot.us-west-2.amazonaws.com"
 	rootCAPath = "rootca.pem"
 	certificatePath = "certificate.pem.crt"
 	privateKeyPath = "private.pem.key"

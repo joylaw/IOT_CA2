@@ -56,7 +56,7 @@ def rfid():
 				(status,uid) = mfrc522.MFRC522_Anticoll()
 				datetime, full_path, file_name = prepareImage()
 				bucket_name = setS3()
-				db = pymysql.connect(host = "iot.cyygylyw5wux.us-west-2.rds.amazonaws.com", user="admin",passwd="!QWER4321", port=3306, db="iot")
+				db = pymysql.connect(host = "iotca2.cmwnxcwvcz4v.us-west-2.rds.amazonaws.com", user="admin",passwd="!QWER4321", port=3306, db="iotca2")
 				s3.Object(bucket_name, file_name).put(Body=open(full_path, 'rb'))
 				try:
 				    with db.cursor() as cur:
@@ -79,6 +79,7 @@ def light_controller(client, userdata, message):
 
 	if data is not None:
 		led = int(data["led"])
+		print led
 		if led <= len(LEDS):
 			if data["status"] == "ON":
 				LEDS[led].on()
@@ -89,14 +90,13 @@ def light_controller(client, userdata, message):
 
 def light_status():
 	led_status = {}
-	for led in LEDS:
+	for led in LEDS:	
 		led_status.update({LEDS.index(led):led.is_lit})
-
 	return led_status
 
 def mqtt_connect():
 
-	host = "a2jaqhb8rc300f.iot.us-west-2.amazonaws.com"
+	host = "a7gx67jy14o4h.iot.us-west-2.amazonaws.com"
 	rootCAPath = "rootca.pem"
 	certificatePath = "certificate.pem.crt"
 	privateKeyPath = "private.pem.key"
@@ -128,3 +128,4 @@ def mqtt_connect():
 if __name__ == '__main__':
 	multiprocessing.Process(target=mqtt_connect).start()
 	multiprocessing.Process(target=rfid).start()
+	pause()

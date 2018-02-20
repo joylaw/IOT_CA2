@@ -4,6 +4,8 @@
 <head>
   <title>My Smart Home</title>
 
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+
   <!-- Tell the browser to be responsive to screen width -->
   <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
@@ -23,13 +25,14 @@
   <!-- Google Font -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 
-  <link type="text/css" rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="/static/bower_components/DataTables/datatables.min.css">
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script src="/static/bower_components/DataTables/datatables.min.js"></script>
 
   <script type="text/javascript" src="/static/dist/js/Chart.bundle.min.js"></script>
 
   <script type="text/javascript" src="/static/dist/js/moment.js"></script>
+
 
   <script>
 
@@ -132,6 +135,12 @@
     });
 
     $(document).ready(function() {
+
+	$('#example1').DataTable({
+			"pageLength": 7,
+			"dom" : "tp"
+		});
+
       var tempchart = document.getElementById('temp-chart').getContext('2d');
       var humiditychart = document.getElementById('humidity-chart').getContext('2d');
 
@@ -236,6 +245,15 @@
       ledupdate()
     });
   </script>
+<script>
+$(document).ready(function() {
+{% autoescape false %}
+	{% if msg %}
+	 alert( "{{ msg.msg }}" );
+	{% endif %}
+{% endautoescape %}
+})
+</script>
 </head>
 
 <body class="hold-transition skin-blue layout-top-nav">
@@ -262,12 +280,15 @@
                 </div>
 
                 <div class="box-body">
-                  <table class="table table-bordered">
+                  <table id="example1"  class="table table-bordered table-striped dataTable" data-page-length='6'>
+		    <thead>
                     <tr>
                       <th style="width:40%">Date (YYYY:MM:DD)</th>
 		      <th style="width:40%">Time (HH:mm:SS)</th>
                       <th style="width:20%">User</th>
                     </tr>
+		    </thead>
+		    <tbody>
                     {% for row in results %}
                     <tr>
                       <td>{{ row[1][0:10] }}</td>
@@ -275,8 +296,10 @@
                       <td><a href="showImage/{{row[0]}}">{{ row[2] }}</a></td>
                     </tr>
                     {% endfor %}
+		    </tbody>
                   </table>
                 </div>
+		<br />
               </div>
 
             </div>
@@ -363,8 +386,6 @@
             </div>
           </div>
         </section>
-        <!-- jQuery 3 -->
-        <script src="/static/bower_components/jquery/dist/jquery.min.js"></script>
         <!-- Bootstrap 3.3.7 -->
         <script src="/static/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <!-- SlimScroll -->

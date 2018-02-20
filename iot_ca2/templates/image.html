@@ -51,7 +51,7 @@
             							<div class="box-header with-border" id="imageTitle">
               								<h3 class="box-title">User: <strong>{{name}}</strong></h3>
 									<br />
-									<h3 class="box-title">Photo Taken on <strong>{{datetime}}</strong></h3>
+									<h3 class="box-title">Photo Taken on <strong>{{datetime[0:10]}} {{datetime[11:13]}}:{{datetime[14:16]}}:{{datetime[17:19]}}</strong></h3>
             							</div>
 								<br />
 									<img src="https://s3-us-west-2.amazonaws.com/accesssmarthome/{{datetime}}.jpg" alt="image" id="image" width="720px" height="405px">

@@ -12,12 +12,6 @@
             "Effect": "Allow",
             "Action": "iot:*",
             "Resource": "*"
-        },
-    {
-
-            "Effect": "Allow",
-            "Action": "dynamodb:*",
-            "Resource": "arn:aws:dynamodb:us-west-2:460889015060:table/*"
         }
     ]
 }

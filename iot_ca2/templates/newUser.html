@@ -59,9 +59,20 @@
 </style>
 <script>
 $(document).ready(function() {
+	// Modal
+	var span = document.getElementsByClassName("close")[0];
+	var modal = document.getElementById('myModal');
+	span.onclick = function() {
+	    $('#myModal').modal('hide');
+	}
+	window.onclick = function(event) {
+	    if (event.target == modal) {
+	        $('#myModal').modal('hide');
+	    }
+	}
 	$.get( "readRFID", function( data ) {
 	  $('#myModal').modal('show');
-	 alert( "Data Loaded: " + data.uid );
+	 alert( "The UID detected is: " + data.uid );
 	  document.getElementById("uid").value = data.uid;
 	});
 })

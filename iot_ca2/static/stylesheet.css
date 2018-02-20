@@ -69,7 +69,7 @@ input:checked + .slider:before {
 	margin: auto;
 }
 #control{
-	height: 200px;
+	height: 197px;
 }
 #home{
 	margin-left: 130px;
